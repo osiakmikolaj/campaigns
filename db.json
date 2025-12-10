@@ -1,41 +1,28 @@
 {
     "wallet": {
-        "balance": 500.0,
+        "balance": 523.12,
         "currency": "Emerald"
     },
-    "products": [
-        { "id": 101, "name": "Rower Górski X2000" },
-        { "id": 102, "name": "Kask Ochronny Pro" },
-        { "id": 103, "name": "Bidon Sportowy 500ml" }
-    ],
-    "towns": [
-        { "id": 1, "name": "Warszawa" },
-        { "id": 2, "name": "Kraków" },
-        { "id": 3, "name": "Poznań" },
-        { "id": 4, "name": "Wrocław" },
-        { "id": 5, "name": "Gdańsk" }
-    ],
-    "keywords": [
-        { "id": 1, "name": "rower" },
-        { "id": 2, "name": "sport" },
-        { "id": 3, "name": "góry" },
-        { "id": 4, "name": "szosa" },
-        { "id": 5, "name": "akcesoria" },
-        { "id": 6, "name": "bezpieczeństwo" },
-        { "id": 7, "name": "lato" },
-        { "id": 8, "name": "wyprzedaż" }
-    ],
     "campaigns": [
         {
             "id": 1,
-            "name": "Wiosenna Promocja",
-            "keywords": ["rower", "sport"],
-            "bidAmount": 1.2,
+            "name": "Spring promotion",
+            "keywords": ["bicycle", "sport"],
+            "bidAmount": 10,
             "campaignFund": 200.0,
             "status": "on",
-            "town": "Warszawa",
-            "radius": 15,
-            "productId": 101
+            "town": "Warsaw",
+            "radius": 15
+        },
+        {
+            "id": 2,
+            "name": "Holiday promotion",
+            "keywords": ["vacation", "plane"],
+            "bidAmount": 100,
+            "campaignFund": 450.0,
+            "status": "off",
+            "town": "London",
+            "radius": 25
         }
     ]
 }
