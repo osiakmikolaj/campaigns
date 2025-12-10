@@ -1,124 +1,140 @@
 {
-    "wallet": {
-        "balance": 5400,
-        "currency": "$"
+  "wallet": {
+    "item": {
+      "item": {
+        "item": {
+          "balance": 5400,
+          "currency": "$"
+        },
+        "balance": 5000
+      },
+      "balance": 4900
     },
-    "products": [
+    "balance": 4869
+  },
+  "products": [
+    {
+      "id": "101",
+      "name": "Mountain Bike X2000"
+    },
+    {
+      "id": "102",
+      "name": "Protective Helmet Pro"
+    },
+    {
+      "id": "103",
+      "name": "Sports Water Bottle 500ml"
+    }
+  ],
+  "towns": [
+    {
+      "id": "1",
+      "name": "Warsaw"
+    },
+    {
+      "id": "2",
+      "name": "Krakow"
+    },
+    {
+      "id": "3",
+      "name": "Poznan"
+    },
+    {
+      "id": "4",
+      "name": "Wroclaw"
+    },
+    {
+      "id": "5",
+      "name": "Gdansk"
+    }
+  ],
+  "keywords": [
+    {
+      "id": "1",
+      "name": "bike"
+    },
+    {
+      "id": "2",
+      "name": "sport"
+    },
+    {
+      "id": "3",
+      "name": "mountains"
+    },
+    {
+      "id": "4",
+      "name": "road"
+    },
+    {
+      "id": "5",
+      "name": "accessories"
+    },
+    {
+      "id": "6",
+      "name": "safety"
+    },
+    {
+      "id": "7",
+      "name": "summer"
+    },
+    {
+      "id": "8",
+      "name": "sale"
+    }
+  ],
+  "campaigns": [
+    {
+      "id": "1",
+      "name": "Spring Promotion",
+      "keywords": [
         {
-            "id": "101",
-            "name": "Mountain Bike X2000"
+          "id": 1765399266878,
+          "name": "bike"
         },
         {
-            "id": "102",
-            "name": "Protective Helmet Pro"
+          "id": 1765399266879,
+          "name": "sport"
         },
         {
-            "id": "103",
-            "name": "Sports Water Bottle 500ml"
+          "id": 1765399266880,
+          "name": "hillclimb"
         }
-    ],
-    "towns": [
-        {
-            "id": "1",
-            "name": "Warsaw"
-        },
-        {
-            "id": "2",
-            "name": "Krakow"
-        },
-        {
-            "id": "3",
-            "name": "Poznan"
-        },
-        {
-            "id": "4",
-            "name": "Wroclaw"
-        },
-        {
-            "id": "5",
-            "name": "Gdansk"
-        }
-    ],
-    "keywords": [
-        {
-            "id": "1",
-            "name": "bike"
-        },
-        {
-            "id": "2",
-            "name": "sport"
-        },
-        {
-            "id": "3",
-            "name": "mountains"
-        },
-        {
-            "id": "4",
-            "name": "road"
-        },
-        {
-            "id": "5",
-            "name": "accessories"
-        },
-        {
-            "id": "6",
-            "name": "safety"
-        },
-        {
-            "id": "7",
-            "name": "summer"
-        },
-        {
-            "id": "8",
-            "name": "sale"
-        }
-    ],
-    "campaigns": [
-        {
-            "id": "1",
-            "name": "Spring Promotion",
-            "keywords": [
-                {
-                    "id": 1765399266878,
-                    "name": "bike"
-                },
-                {
-                    "id": 1765399266879,
-                    "name": "sport"
-                },
-                {
-                    "id": 1765399266880,
-                    "name": "hillclimb"
-                }
-            ],
-            "bidAmount": 2,
-            "campaignFund": 120,
-            "status": "on",
-            "town": "Gdansk",
-            "radius": 25,
-            "productId": 101
-        },
-        {
-            "id": "2",
-            "name": "Summer Helmet Sale",
-            "keywords": ["safety", "sale", "summer"],
-            "bidAmount": 0.95,
-            "campaignFund": 150,
-            "status": "off",
-            "town": "Krakow",
-            "radius": 10,
-            "productId": 102
-        },
-        {
-            "id": "3",
-            "name": "Mountain Riding Special",
-            "keywords": ["mountains", "accessories"],
-            "bidAmount": 1.5,
-            "campaignFund": 350,
-            "status": "on",
-            "town": "Wroclaw",
-            "radius": 25,
-            "productId": 103
-        }
-    ]
+      ],
+      "bidAmount": 2,
+      "campaignFund": 120,
+      "status": "on",
+      "town": "Gdansk",
+      "radius": 25,
+      "productId": 101
+    },
+    {
+      "id": "2",
+      "name": "Summer Helmet Sale",
+      "keywords": [
+        "safety",
+        "sale",
+        "summer"
+      ],
+      "bidAmount": 0.95,
+      "campaignFund": 150,
+      "status": "off",
+      "town": "Krakow",
+      "radius": 10,
+      "productId": 102
+    },
+    {
+      "id": "3",
+      "name": "Mountain Riding Special",
+      "keywords": [
+        "mountains",
+        "accessories"
+      ],
+      "bidAmount": 1.5,
+      "campaignFund": 350,
+      "status": "on",
+      "town": "Wroclaw",
+      "radius": 25,
+      "productId": 103
+    }
+  ]
 }

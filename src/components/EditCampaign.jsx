@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./Dashboard.css";
+import LoadingScreen from "./LoadingScreen";
 
 const EditCampaign = ({ id, onCancel, onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -67,7 +68,7 @@ const EditCampaign = ({ id, onCancel, onSuccess }) => {
     };
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <LoadingScreen />;
     }
 
     return (

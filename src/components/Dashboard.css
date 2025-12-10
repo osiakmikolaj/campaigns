@@ -185,3 +185,40 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* --- Style Formularza --- */
+.campaign-form {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 600px; /* Ograniczamy szerokość żeby nie był za szeroki */
+    margin: 0 auto; /* Wyśrodkowanie */
+}
+
+.form-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #34495e;
+}
+
+.form-group input,
+.form-group select {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end; /* Przyciski do prawej */
+    gap: 15px;
+    margin-top: 30px;
+}
