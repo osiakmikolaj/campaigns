@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import "../Dashboard/Dashboard.css";
 import LoadingScreen from "../LoadingScreen/LoadingScreen";
 import "./CampaignForm.css";
+import "react-bootstrap-typeahead/css/Typeahead.css";
+import { Typeahead } from "react-bootstrap-typeahead";
 
 const EditCampaign = ({ id, onCancel, onSuccess }) => {
     const [formData, setFormData] = useState({
         name: "",
-        keywords: "",
+        keywords: [],
         bidAmount: 0,
         minAmount: 0,
         campaignFund: 0,
@@ -18,19 +20,24 @@ const EditCampaign = ({ id, onCancel, onSuccess }) => {
 
     const [towns, setTowns] = useState([]);
     const [products, setProducts] = useState([]);
+    const [availableKeywords, setAvailableKeywords] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        Promise.all([fetch(`/towns`).then((r) => r.json()), fetch(`/products`).then((r) => r.json()), fetch(`/campaigns/${id}`).then((r) => r.json())])
-            .then(([townsData, productsData, campaignData]) => {
+        Promise.all([
+            fetch(`/towns`).then((r) => r.json()),
+            fetch(`/products`).then((r) => r.json()),
+            fetch(`/campaigns/${id}`).then((r) => r.json()),
+            fetch(`/keywords`).then((r) => r.json()),
+        ])
+            .then(([townsData, productsData, campaignData, keywordsData]) => {
                 setTowns(townsData);
                 setProducts(productsData);
-
-                const keywordsString = Array.isArray(campaignData.keywords) ? campaignData.keywords.map((k) => k.name || k).join(", ") : campaignData.keywords;
+                setAvailableKeywords(keywordsData);
 
                 setFormData({
                     ...campaignData,
-                    keywords: keywordsString,
+                    keywords: campaignData.keywords || [],
                 });
                 setLoading(false);
             })
@@ -64,10 +71,7 @@ const EditCampaign = ({ id, onCancel, onSuccess }) => {
                 campaignFund: parseFloat(formData.campaignFund),
                 radius: parseInt(formData.radius),
                 productId: parseInt(formData.productId),
-                keywords: formData.keywords.split(",").map((k, index) => ({
-                    id: Date.now() + index,
-                    name: k.trim(),
-                })),
+                keywords: formData.keywords,
             };
 
             await fetch(`/campaigns/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(updatedCampaign) });
@@ -93,7 +97,17 @@ const EditCampaign = ({ id, onCancel, onSuccess }) => {
 
                 <div className="form-group">
                     <label>Keywords:</label>
-                    <input type="text" name="keywords" value={formData.keywords} onChange={handleChange} />
+                    <Typeahead
+                        id="keywords-typeahead"
+                        multiple
+                        labelKey="name"
+                        options={availableKeywords}
+                        selected={formData.keywords}
+                        placeholder="Select keywords..."
+                        onChange={(selected) => {
+                            setFormData({ ...formData, keywords: selected });
+                        }}
+                    />
                 </div>
 
                 <div className="form-group">
@@ -144,7 +158,7 @@ const EditCampaign = ({ id, onCancel, onSuccess }) => {
                     <label>Status:</label>
                     <select name="status" value={formData.status} onChange={handleChange}>
                         <option value="on">Active</option>
-                        <option value="off">Not Active</option>
+                        <option value="off">Inactive</option>
                     </select>
                 </div>
 

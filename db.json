@@ -154,6 +154,94 @@
     {
       "id": "17",
       "name": "health"
+    },
+    {
+      "id": "18",
+      "name": "marathon"
+    },
+    {
+      "id": "19",
+      "name": "wellness"
+    },
+    {
+      "id": "20",
+      "name": "cardio"
+    },
+    {
+      "id": "21",
+      "name": "strength"
+    },
+    {
+      "id": "22",
+      "name": "training"
+    },
+    {
+      "id": "23",
+      "name": "meditation"
+    },
+    {
+      "id": "24",
+      "name": "trekking"
+    },
+    {
+      "id": "25",
+      "name": "adventure"
+    },
+    {
+      "id": "26",
+      "name": "waterproof"
+    },
+    {
+      "id": "27",
+      "name": "hydration"
+    },
+    {
+      "id": "28",
+      "name": "cycling"
+    },
+    {
+      "id": "29",
+      "name": "urban"
+    },
+    {
+      "id": "30",
+      "name": "discount"
+    },
+    {
+      "id": "31",
+      "name": "promotion"
+    },
+    {
+      "id": "32",
+      "name": "premium"
+    },
+    {
+      "id": "33",
+      "name": "gps"
+    },
+    {
+      "id": "34",
+      "name": "tracker"
+    },
+    {
+      "id": "35",
+      "name": "crossfit"
+    },
+    {
+      "id": "36",
+      "name": "pilates"
+    },
+    {
+      "id": "37",
+      "name": "smart"
+    },
+    {
+      "id": "38",
+      "name": "weights"
+    },
+    {
+      "id": "39",
+      "name": "relax"
     }
   ],
   "campaigns": [
@@ -250,16 +338,8 @@
       "name": "Smart Tech for Active",
       "keywords": [
         {
-          "id": 1765405125792,
-          "name": "technology"
-        },
-        {
-          "id": 1765405125793,
-          "name": "sport"
-        },
-        {
-          "id": 1765405125794,
-          "name": "smart"
+          "id": "1",
+          "name": "bike"
         }
       ],
       "bidAmount": 5,

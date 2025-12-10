@@ -5,7 +5,7 @@ const CampaignCard = ({ campaign, onDelete, onEdit }) => {
         <div className="campaign-card">
             <div className="card-header">
                 <h3>{campaign.name}</h3>
-                <span className={`status-badge ${campaign.status === "on" ? "active" : "inactive"}`}>{campaign.status === "on" ? "ACTIVE" : "OFF"}</span>
+                <span className={`status-badge ${campaign.status === "on" ? "active" : "inactive"}`}>{campaign.status === "on" ? "ACTIVE" : "INACTIVE"}</span>
             </div>
 
             <div className="card-body">

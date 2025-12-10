@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import LoadingScreen from "../LoadingScreen/LoadingScreen";
 import "./CampaignForm.css";
+import { Typeahead } from "react-bootstrap-typeahead";
 
 const CreateCampaign = ({ onCancel, onSuccess }) => {
     const [formData, setFormData] = useState({
         name: "",
-        keywords: "",
+        keywords: [],
         bidAmount: 0,
         minAmount: 0,
         campaignFund: 0,
@@ -17,13 +18,15 @@ const CreateCampaign = ({ onCancel, onSuccess }) => {
 
     const [towns, setTowns] = useState([]);
     const [products, setProducts] = useState([]);
+    const [availableKeywords, setaAvailableKeywords] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        Promise.all([fetch(`/towns`).then((r) => r.json()), fetch(`/products`).then((r) => r.json())])
-            .then(([townsData, productsData]) => {
+        Promise.all([fetch(`/towns`).then((r) => r.json()), fetch(`/products`).then((r) => r.json()), fetch(`/keywords`).then((r) => r.json())])
+            .then(([townsData, productsData, keywordsData]) => {
                 setTowns(townsData);
                 setProducts(productsData);
+                setaAvailableKeywords(keywordsData);
                 setLoading(false);
             })
             .catch((e) => {
@@ -59,21 +62,15 @@ const CreateCampaign = ({ onCancel, onSuccess }) => {
                 return;
             }
 
-            const newBalance = wallet.balance - cost;
             await fetch(`/wallet`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ balance: newBalance }),
+                body: JSON.stringify({ balance: wallet.balance - cost }),
             });
-
-            const keywordsArray = formData.keywords.split(",").map((word, index) => ({
-                id: Date.now() + index,
-                name: word.trim(),
-            }));
 
             const newCampaign = {
                 name: formData.name,
-                keywords: keywordsArray,
+                keywords: formData.keywords,
                 bidAmount: parseFloat(formData.bidAmount),
                 minAmount: parseFloat(formData.minAmount),
                 campaignFund: parseFloat(formData.campaignFund),
@@ -123,8 +120,17 @@ const CreateCampaign = ({ onCancel, onSuccess }) => {
                 </div>
 
                 <div className="form-group">
-                    <label>Keywords (separate with commas):</label>
-                    <input type="text" name="keywords" placeholder="e.g. bike, summer, sale" required onChange={handleChange} />
+                    <label>Keywords:</label>
+                    <Typeahead
+                        id="keywords-typeahead"
+                        multiple
+                        labelKey="name"
+                        options={availableKeywords}
+                        placeholder="Select required keywords..."
+                        onChange={(selected) => {
+                            setFormData({ ...formData, keywords: selected });
+                        }}
+                    />
                 </div>
 
                 <div className="form-group">
@@ -162,7 +168,7 @@ const CreateCampaign = ({ onCancel, onSuccess }) => {
                 <div className="form-group">
                     <label>Status:</label>
                     <select name="status" onChange={handleChange}>
-                        <option value="off">Unactive (OFF)</option>
+                        <option value="off">Inactive (OFF)</option>
                         <option value="on">Active (ON)</option>
                     </select>
                 </div>
