@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./Dashboard.css";
-import CampaignCard from "./CampaignCard";
-import LoadingScreen from "./LoadingScreen";
+import CampaignCard from "../CampaignCard/CampaignCard";
+import LoadingScreen from "../LoadingScreen/LoadingScreen";
 
 const Dashboard = ({ onNavigateToEdit, onNavigateToCreate }) => {
     const [campaigns, setCampaigns] = useState([]);
@@ -57,7 +57,7 @@ const Dashboard = ({ onNavigateToEdit, onNavigateToCreate }) => {
             <header className="dashboard-header">
                 <h1>Campaigns</h1>
                 <div className="wallet-card">
-                    <span className="wallet-label">Funds</span>
+                    <span className="wallet-label">Emerald Account Funds</span>
                     <span className="wallet-balance">{wallet?.balance.toFixed(2)}</span>
                 </div>
             </header>

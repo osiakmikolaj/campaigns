@@ -1,3 +1,5 @@
+import "./CampaignCard.css";
+
 const CampaignCard = ({ campaign, onDelete, onEdit }) => {
     return (
         <div className="campaign-card">

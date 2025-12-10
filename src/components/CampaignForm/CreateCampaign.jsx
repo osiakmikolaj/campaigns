@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import LoadingScreen from "./LoadingScreen";
+import LoadingScreen from "../LoadingScreen/LoadingScreen";
+import "./CampaignForm.css";
 
 const CreateCampaign = ({ onCancel, onSuccess }) => {
     const [formData, setFormData] = useState({

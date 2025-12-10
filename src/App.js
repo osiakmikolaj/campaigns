@@ -1,8 +1,7 @@
 import { use, useState } from "react";
-import "./App.css";
-import Dashboard from "./components/Dashboard";
-import EditCampaign from "./components/EditCampaign";
-import CreateCampaign from "./components/CreateCampaign";
+import Dashboard from "./components/Dashboard/Dashboard";
+import EditCampaign from "./components/CampaignForm/EditCampaign";
+import CreateCampaign from "./components/CampaignForm/CreateCampaign";
 
 function App() {
     const [view, setView] = useState("dashboard");
