@@ -27,6 +27,9 @@ const CampaignCard = ({ campaign, onDelete, onEdit }) => {
                     <span>Bid Amount:</span> <strong>{campaign.bidAmount}</strong>
                 </div>
                 <div className="info-row">
+                    <span>Min Amount:</span> <strong>{campaign.minAmount}</strong>
+                </div>
+                <div className="info-row">
                     <span>Funds:</span> <strong>{campaign.campaignFund}</strong>
                 </div>
             </div>

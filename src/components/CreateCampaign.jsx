@@ -6,6 +6,7 @@ const CreateCampaign = ({ onCancel, onSuccess }) => {
         name: "",
         keywords: "",
         bidAmount: 0,
+        minAmount: 0,
         campaignFund: 0,
         status: "off",
         town: "",
@@ -38,6 +39,13 @@ const CreateCampaign = ({ onCancel, onSuccess }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const cost = parseFloat(formData.campaignFund);
+        const bid = parseFloat(formData.bidAmount);
+        const min = parseFloat(formData.minAmount);
+
+        if (min > bid) {
+            alert("Min Amount cannot be greater than Bid Amount!");
+            return;
+        }
 
         if (cost <= 0) return alert("Not enough funds!");
 
@@ -66,6 +74,7 @@ const CreateCampaign = ({ onCancel, onSuccess }) => {
                 name: formData.name,
                 keywords: keywordsArray,
                 bidAmount: parseFloat(formData.bidAmount),
+                minAmount: parseFloat(formData.minAmount),
                 campaignFund: parseFloat(formData.campaignFund),
                 status: formData.status,
                 town: formData.town,
@@ -136,7 +145,12 @@ const CreateCampaign = ({ onCancel, onSuccess }) => {
 
                 <div className="form-group">
                     <label>Bid Amount:</label>
-                    <input type="number" step="0.01" name="bidAmount" required onChange={handleChange} />
+                    <input type="number" min="1" step="0.01" name="bidAmount" required onChange={handleChange} />
+                </div>
+
+                <div className="form-group">
+                    <label>Min Amount:</label>
+                    <input type="number" step="0.01" name="minAmount" required onChange={handleChange} />
                 </div>
 
                 <div className="form-group">
