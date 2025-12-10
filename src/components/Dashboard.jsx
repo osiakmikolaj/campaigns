@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "./Dashboard.css";
 import CampaignCard from "./CampaignCard";
 
-const Dashboard = () => {
+const Dashboard = ({ onNavigateToEdit, onNavigateToCreate }) => {
     const [campaigns, setCampaigns] = useState([]);
     const [wallet, setWallet] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -43,8 +43,9 @@ const Dashboard = () => {
         }
     };
 
-    // todo
-    const handleEdit = (id) => {};
+    const handleEdit = (id) => {
+        onNavigateToEdit(id);
+    };
 
     if (loading) return <div>Loading campaigns...</div>;
 
@@ -54,12 +55,16 @@ const Dashboard = () => {
                 <h1>Campaigns</h1>
                 <div className="wallet-card">
                     <span className="wallet-label">Funds</span>
-                    <span className="wallet-balance">{wallet?.balance.toFixed(2)}</span>
+                    <span className="wallet-balance">
+                        {wallet?.currency} {wallet?.balance.toFixed(2)}
+                    </span>
                 </div>
             </header>
 
             <div className="action-bar">
-                <button className="btn-primary">Add Campaign</button>
+                <button className="btn-primary" onClick={onNavigateToCreate}>
+                    Add Campaign
+                </button>
             </div>
 
             <div className="campaign-grid">

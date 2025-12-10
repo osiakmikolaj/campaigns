@@ -52,6 +52,12 @@
     background-color: var(--primary-dark);
 }
 
+.campaign-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
 .campaign-card {
     background: var(--card-bg);
     border-radius: 10px;
@@ -169,6 +175,10 @@
         align-items: center;
         border-right: none;
         border-bottom: 5px solid var(--primary);
+    }
+
+    .action-bar {
+        justify-content: center;
     }
 
     .campaign-grid {
