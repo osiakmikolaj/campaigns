@@ -28,9 +28,8 @@ const Dashboard = ({ onNavigateToEdit, onNavigateToCreate }) => {
                     fetch(`${API_URL}/rest/v1/wallet?select=*`, { headers: getHeaders() }),
                 ]);
 
-                // 2. POPRAWKA: Sprawdzenie czy odpowiedzi są OK
                 if (!campaignsRes.ok || !walletRes.ok) {
-                    throw new Error("Błąd pobierania danych z API");
+                    throw new Error("Error! Fetching the data from API");
                 }
 
                 const campaignsData = await campaignsRes.json();
@@ -122,10 +121,7 @@ const Dashboard = ({ onNavigateToEdit, onNavigateToCreate }) => {
                 <div className="card border-1 shadow-sm ms-auto">
                     <div className="card-body py-2 px-3 d-flex flex-column align-items-end">
                         <span className="text-muted small text-uppercase fw-bold">Emerald Account Funds</span>
-                        <span className="h4 fw-bold text-primary mb-0">
-                            {/* 4. POPRAWKA: Usunięcie wallet.currency (bo nie ma go w bazie) i dodanie hardcoded $ lub PLN */}${" "}
-                            {wallet?.balance?.toFixed(2) || "0.00"}
-                        </span>
+                        <span className="h4 fw-bold text-primary mb-0">{wallet?.balance?.toFixed(2) || "0.00"}</span>
                     </div>
                 </div>
             </header>
