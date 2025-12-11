@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Typeahead } from "react-bootstrap-typeahead";
 import LoadingScreen from "./LoadingScreen";
 
-const API_URL = process.env.SUPABASE_URL;
-const API_KEY = process.env.SUPABASE_KEY;
+const API_URL = process.env.REACT_APP_SUPABASE_URL;
+const API_KEY = process.env.REACT_APP_SUPABASE_KEY;
 
 const getHeaders = () => ({
     apikey: API_KEY,
@@ -109,6 +109,7 @@ const CreateCampaign = ({ onCancel, onSuccess }) => {
             });
 
             const newCampaign = {
+                id: Date.now().toString(),
                 name: formData.name,
                 keywords: formData.keywords,
                 bidAmount: parseFloat(formData.bidAmount),

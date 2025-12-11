@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import CampaignCard from "./CampaignCard";
 import LoadingScreen from "./LoadingScreen";
 
-const API_URL = process.env.SUPABASE_URL;
-const API_KEY = process.env.SUPABASE_KEY;
+const API_URL = process.env.REACT_APP_SUPABASE_URL;
+const API_KEY = process.env.REACT_APP_SUPABASE_KEY;
 
 const getHeaders = () => ({
     apikey: API_KEY,
@@ -27,12 +27,20 @@ const Dashboard = ({ onNavigateToEdit, onNavigateToCreate }) => {
                     fetch(`${API_URL}/rest/v1/campaigns?select=*`, { headers: getHeaders() }),
                     fetch(`${API_URL}/rest/v1/wallet?select=*`, { headers: getHeaders() }),
                 ]);
+
+                // 2. POPRAWKA: Sprawdzenie czy odpowiedzi są OK
+                if (!campaignsRes.ok || !walletRes.ok) {
+                    throw new Error("Błąd pobierania danych z API");
+                }
+
                 const campaignsData = await campaignsRes.json();
                 const walletData = await walletRes.json();
+
                 setCampaigns(campaignsData);
-                setWallet(walletData[0]);
+                setWallet(walletData.length > 0 ? walletData[0] : { balance: 0 });
             } catch (e) {
                 console.error("Error!", e);
+                setAlertInfo({ type: "danger", message: "Failed to load data from server." });
             } finally {
                 setLoading(false);
             }
@@ -115,7 +123,8 @@ const Dashboard = ({ onNavigateToEdit, onNavigateToCreate }) => {
                     <div className="card-body py-2 px-3 d-flex flex-column align-items-end">
                         <span className="text-muted small text-uppercase fw-bold">Emerald Account Funds</span>
                         <span className="h4 fw-bold text-primary mb-0">
-                            {wallet?.currency} {wallet?.balance.toFixed(2)}
+                            {/* 4. POPRAWKA: Usunięcie wallet.currency (bo nie ma go w bazie) i dodanie hardcoded $ lub PLN */}${" "}
+                            {wallet?.balance?.toFixed(2) || "0.00"}
                         </span>
                     </div>
                 </div>
