@@ -2,6 +2,16 @@ import { useEffect, useState } from "react";
 import { Typeahead } from "react-bootstrap-typeahead";
 import LoadingScreen from "./LoadingScreen";
 
+const API_URL = process.env.SUPABASE_URL;
+const API_KEY = process.env.SUPABASE_KEY;
+
+const getHeaders = () => ({
+    apikey: API_KEY,
+    Authorization: `Bearer ${API_KEY}`,
+    "Content-Type": "application/json",
+    Prefer: "return=representation",
+});
+
 const CreateCampaign = ({ onCancel, onSuccess }) => {
     const [formData, setFormData] = useState({
         name: "",
@@ -22,17 +32,29 @@ const CreateCampaign = ({ onCancel, onSuccess }) => {
     const [alertInfo, setAlertInfo] = useState(null);
 
     useEffect(() => {
-        Promise.all([fetch(`/towns`).then((r) => r.json()), fetch(`/products`).then((r) => r.json()), fetch(`/keywords`).then((r) => r.json())])
-            .then(([townsData, productsData, keywordsData]) => {
+        const fetchData = async () => {
+            try {
+                const [townsRes, productsRes, keywordsRes] = await Promise.all([
+                    fetch(`${API_URL}/rest/v1/towns?select=*`, { headers: getHeaders() }),
+                    fetch(`${API_URL}/rest/v1/products?select=*`, { headers: getHeaders() }),
+                    fetch(`${API_URL}/rest/v1/keywords?select=*`, { headers: getHeaders() }),
+                ]);
+
+                const townsData = await townsRes.json();
+                const productsData = await productsRes.json();
+                const keywordsData = await keywordsRes.json();
+
                 setTowns(townsData);
                 setProducts(productsData);
                 setaAvailableKeywords(keywordsData);
                 setLoading(false);
-            })
-            .catch((e) => {
+            } catch (e) {
                 console.error("Failed to fetch data", e);
                 setLoading(false);
-            });
+            }
+        };
+
+        fetchData();
     }, []);
 
     const handleChange = (e) => {
@@ -64,17 +86,25 @@ const CreateCampaign = ({ onCancel, onSuccess }) => {
         }
 
         try {
-            const walletRes = await fetch(`/wallet`);
-            const wallet = await walletRes.json();
+            const walletRes = await fetch(`${API_URL}/rest/v1/wallet?select=*`, {
+                headers: getHeaders(),
+            });
+            const walletData = await walletRes.json();
+
+            if (!walletData || walletData.length === 0) {
+                throw new Error("Wallet not found");
+            }
+
+            const wallet = walletData[0];
 
             if (wallet.balance < cost) {
-                setAlertInfo({ type: "danger", message: `Not enough funds! (Cost: ${cost}, Available funds: ${wallet.balance}` });
+                setAlertInfo({ type: "danger", message: `Not enough funds! (Cost: ${cost}, Available funds: ${wallet.balance})` });
                 return;
             }
 
-            await fetch(`/wallet`, {
+            await fetch(`${API_URL}/rest/v1/wallet?id=eq.${wallet.id}`, {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json" },
+                headers: getHeaders(),
                 body: JSON.stringify({ balance: wallet.balance - cost }),
             });
 
@@ -87,12 +117,12 @@ const CreateCampaign = ({ onCancel, onSuccess }) => {
                 status: formData.status,
                 town: formData.town,
                 radius: parseInt(formData.radius),
-                productId: parseInt(formData.productId),
+                productId: String(formData.productId),
             };
 
-            await fetch(`/campaigns`, {
+            await fetch(`${API_URL}/rest/v1/campaigns`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: getHeaders(),
                 body: JSON.stringify(newCampaign),
             });
 
@@ -100,7 +130,7 @@ const CreateCampaign = ({ onCancel, onSuccess }) => {
             setTimeout(() => onSuccess(), 2000);
         } catch (e) {
             console.log(e);
-            setAlertInfo({ type: "danger", message: "An error occurred." });
+            setAlertInfo({ type: "danger", message: "An error occurred while communicating with the database." });
         }
     };
 
@@ -119,7 +149,7 @@ const CreateCampaign = ({ onCancel, onSuccess }) => {
             )}
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                    <label for="product-select" className="form-label">
+                    <label htmlFor="product-select" className="form-label">
                         Product
                     </label>
                     <select id="product-select" className="form-control" name="productId" required onChange={handleChange}>
@@ -133,14 +163,14 @@ const CreateCampaign = ({ onCancel, onSuccess }) => {
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label" for="campaign-name">
+                    <label className="form-label" htmlFor="campaign-name">
                         Campaign Name
                     </label>
                     <input className="form-control" id="campaign-name" type="text" name="name" required onChange={handleChange} />
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label" for="keywords-typeahead">
+                    <label className="form-label" htmlFor="keywords-typeahead">
                         Keywords
                     </label>
                     <Typeahead
@@ -156,7 +186,7 @@ const CreateCampaign = ({ onCancel, onSuccess }) => {
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label" for="city-select">
+                    <label className="form-label" htmlFor="city-select">
                         City
                     </label>
                     <select id="city-select" className="form-control" name="town" required onChange={handleChange}>
@@ -170,28 +200,28 @@ const CreateCampaign = ({ onCancel, onSuccess }) => {
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label" for="radius-input">
+                    <label className="form-label" htmlFor="radius-input">
                         Radius (km)
                     </label>
                     <input id="radius-input" className="form-control" type="number" name="radius" required onChange={handleChange} />
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label" for="bid-amount">
+                    <label className="form-label" htmlFor="bid-amount">
                         Bid Amount
                     </label>
-                    <input id="bid-amount" className="form-control" type="number" min="1" step="0.01" name="bidAmount" required onChange={handleChange} />
+                    <input id="bid-amount" className="form-control" type="number" min="0" step="0.01" name="bidAmount" required onChange={handleChange} />
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label" for="min-amount">
+                    <label className="form-label" htmlFor="min-amount">
                         Minimum Bid Amount
                     </label>
                     <input id="min-amount" className="form-control" type="number" step="0.01" name="minAmount" required onChange={handleChange} />
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label" for="campaign-funds">
+                    <label className="form-label" htmlFor="campaign-funds">
                         Campaign Funds (taken from the wallet)
                     </label>
                     <input id="campaign-funds" className="form-control" type="number" step="0.01" name="campaignFund" required onChange={handleChange} />

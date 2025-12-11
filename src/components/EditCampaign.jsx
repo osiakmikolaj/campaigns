@@ -2,6 +2,16 @@ import { useEffect, useState } from "react";
 import { Typeahead } from "react-bootstrap-typeahead";
 import LoadingScreen from "./LoadingScreen";
 
+const API_URL = process.env.SUPABASE_URL;
+const API_KEY = process.env.SUPABASE_KEY;
+
+const getHeaders = () => ({
+    apikey: API_KEY,
+    Authorization: `Bearer ${API_KEY}`,
+    "Content-Type": "application/json",
+    Prefer: "return=representation",
+});
+
 const EditCampaign = ({ id, onCancel, onSuccess }) => {
     const [formData, setFormData] = useState({
         name: "",
@@ -24,16 +34,17 @@ const EditCampaign = ({ id, onCancel, onSuccess }) => {
 
     useEffect(() => {
         Promise.all([
-            fetch(`/towns`).then((r) => r.json()),
-            fetch(`/products`).then((r) => r.json()),
-            fetch(`/campaigns/${id}`).then((r) => r.json()),
-            fetch(`/keywords`).then((r) => r.json()),
+            fetch(`${API_URL}/rest/v1/towns?select=*`, { headers: getHeaders() }).then((r) => r.json()),
+            fetch(`${API_URL}/rest/v1/products?select=*`, { headers: getHeaders() }).then((r) => r.json()),
+            fetch(`${API_URL}/rest/v1/campaigns?id=eq.${id}&select=*`, { headers: getHeaders() }).then((r) => r.json()),
+            fetch(`${API_URL}/rest/v1/keywords?select=*`, { headers: getHeaders() }).then((r) => r.json()),
         ])
-            .then(([townsData, productsData, campaignData, keywordsData]) => {
+            .then(([townsData, productsData, campaignDataRes, keywordsData]) => {
                 setTowns(townsData);
                 setProducts(productsData);
                 setAvailableKeywords(keywordsData);
 
+                const campaignData = campaignDataRes[0];
                 setFormData({
                     ...campaignData,
                     keywords: campaignData.keywords || [],
@@ -74,17 +85,18 @@ const EditCampaign = ({ id, onCancel, onSuccess }) => {
             const diff = newFund - originalFund;
 
             if (diff !== 0) {
-                const walletRes = await fetch(`/wallet`);
-                const wallet = await walletRes.json();
+                const walletRes = await fetch(`${API_URL}/rest/v1/wallet?select=*`, { headers: getHeaders() });
+                const walletData = await walletRes.json();
+                const wallet = walletData[0];
 
                 if (diff > 0 && wallet.balance < diff) {
                     setAlertInfo({ type: "danger", message: `Not enough funds! (Required: ${diff}, Available: ${wallet.balance})` });
                     return;
                 }
 
-                await fetch(`/wallet`, {
+                await fetch(`${API_URL}/rest/v1/wallet?id=eq.${wallet.id}`, {
                     method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
+                    headers: getHeaders(),
                     body: JSON.stringify({ balance: wallet.balance - diff }),
                 });
             }
@@ -95,11 +107,15 @@ const EditCampaign = ({ id, onCancel, onSuccess }) => {
                 minAmount: parseFloat(formData.minAmount),
                 campaignFund: newFund,
                 radius: parseInt(formData.radius),
-                productId: parseInt(formData.productId),
+                productId: String(formData.productId),
                 keywords: formData.keywords,
             };
 
-            await fetch(`/campaigns/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(updatedCampaign) });
+            await fetch(`${API_URL}/rest/v1/campaigns?id=eq.${id}`, {
+                method: "PATCH",
+                headers: getHeaders(),
+                body: JSON.stringify(updatedCampaign),
+            });
             setAlertInfo({ type: "success", message: "The changes are saved!" });
             setTimeout(() => onSuccess(), 2000);
         } catch (e) {
@@ -123,12 +139,16 @@ const EditCampaign = ({ id, onCancel, onSuccess }) => {
             )}
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                    <label className="form-label">Campaign Name:</label>
-                    <input className="form-control" type="text" name="name" value={formData.name} required onChange={handleChange} />
+                    <label className="form-label" htmlFor="campaign-name">
+                        Campaign Name:
+                    </label>
+                    <input className="form-control" id="campaign-name" type="text" name="name" value={formData.name} required onChange={handleChange} />
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label">Keywords</label>
+                    <label className="form-label" htmlFor="keywords-typeahead">
+                        Keywords
+                    </label>
                     <Typeahead
                         id="keywords-typeahead"
                         multiple
@@ -143,8 +163,10 @@ const EditCampaign = ({ id, onCancel, onSuccess }) => {
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label">Product</label>
-                    <select className="form-control" name="productId" value={formData.productId} onChange={handleChange} required>
+                    <label className="form-label" htmlFor="product-select">
+                        Product
+                    </label>
+                    <select className="form-control" id="product-select" name="productId" value={formData.productId} onChange={handleChange} required>
                         <option value="">Select Product</option>
                         {products.map((p) => (
                             <option key={p.id} value={p.id}>
@@ -155,8 +177,10 @@ const EditCampaign = ({ id, onCancel, onSuccess }) => {
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label">City</label>
-                    <select className="form-control" name="town" value={formData.town} required onChange={handleChange}>
+                    <label className="form-label" htmlFor="city-select">
+                        City
+                    </label>
+                    <select className="form-control" id="city-select" name="town" value={formData.town} required onChange={handleChange}>
                         <option value="">Choose City</option>
                         {towns.map((t) => (
                             <option key={t.id} value={t.name}>
@@ -167,14 +191,19 @@ const EditCampaign = ({ id, onCancel, onSuccess }) => {
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label">Radius (km)</label>
-                    <input className="form-control" type="number" name="radius" value={formData.radius} required onChange={handleChange} />
+                    <label className="form-label" htmlFor="radius-input">
+                        Radius (km)
+                    </label>
+                    <input className="form-control" id="radius-input" type="number" name="radius" value={formData.radius} required onChange={handleChange} />
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label">Bid Amount</label>
+                    <label className="form-label" htmlFor="bid-amount">
+                        Bid Amount
+                    </label>
                     <input
                         className="form-control"
+                        id="bid-amount"
                         type="number"
                         min="1"
                         step="0.01"
@@ -186,14 +215,28 @@ const EditCampaign = ({ id, onCancel, onSuccess }) => {
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label">Minimum Bid Amount:</label>
-                    <input className="form-control" type="number" step="0.01" name="minAmount" value={formData.minAmount} required onChange={handleChange} />
+                    <label className="form-label" htmlFor="min-amount">
+                        Minimum Bid Amount:
+                    </label>
+                    <input
+                        className="form-control"
+                        id="min-amount"
+                        type="number"
+                        step="0.01"
+                        name="minAmount"
+                        value={formData.minAmount}
+                        required
+                        onChange={handleChange}
+                    />
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label">Funds ($):</label>
+                    <label className="form-label" htmlFor="campaign-funds">
+                        Funds ($):
+                    </label>
                     <input
                         className="form-control"
+                        id="campaign-funds"
                         type="number"
                         step="0.01"
                         name="campaignFund"
@@ -204,8 +247,10 @@ const EditCampaign = ({ id, onCancel, onSuccess }) => {
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label">Status</label>
-                    <select className="form-control" name="status" value={formData.status} onChange={handleChange}>
+                    <label className="form-label" htmlFor="status-select">
+                        Status
+                    </label>
+                    <select className="form-control" id="status-select" name="status" value={formData.status} onChange={handleChange}>
                         <option value="on">Active</option>
                         <option value="off">Inactive</option>
                     </select>

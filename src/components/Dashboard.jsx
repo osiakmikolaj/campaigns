@@ -2,6 +2,16 @@ import { useEffect, useState } from "react";
 import CampaignCard from "./CampaignCard";
 import LoadingScreen from "./LoadingScreen";
 
+const API_URL = process.env.SUPABASE_URL;
+const API_KEY = process.env.SUPABASE_KEY;
+
+const getHeaders = () => ({
+    apikey: API_KEY,
+    Authorization: `Bearer ${API_KEY}`,
+    "Content-Type": "application/json",
+    Prefer: "return=representation",
+});
+
 const Dashboard = ({ onNavigateToEdit, onNavigateToCreate }) => {
     const [campaigns, setCampaigns] = useState([]);
     const [wallet, setWallet] = useState(null);
@@ -13,11 +23,14 @@ const Dashboard = ({ onNavigateToEdit, onNavigateToCreate }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [campaignsRes, walletRes] = await Promise.all([fetch(`/campaigns`), fetch(`/wallet`)]);
+                const [campaignsRes, walletRes] = await Promise.all([
+                    fetch(`${API_URL}/rest/v1/campaigns?select=*`, { headers: getHeaders() }),
+                    fetch(`${API_URL}/rest/v1/wallet?select=*`, { headers: getHeaders() }),
+                ]);
                 const campaignsData = await campaignsRes.json();
                 const walletData = await walletRes.json();
                 setCampaigns(campaignsData);
-                setWallet(walletData);
+                setWallet(walletData[0]);
             } catch (e) {
                 console.error("Error!", e);
             } finally {
@@ -34,8 +47,9 @@ const Dashboard = ({ onNavigateToEdit, onNavigateToCreate }) => {
     const confirmDelete = async () => {
         if (!deleteId) return;
         try {
-            const response = await fetch(`/campaigns/${deleteId}`, {
+            const response = await fetch(`${API_URL}/rest/v1/campaigns?id=eq.${deleteId}`, {
                 method: "DELETE",
+                headers: getHeaders(),
             });
 
             if (response.ok) {
