@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import "../Dashboard/Dashboard.css";
 import LoadingScreen from "../LoadingScreen/LoadingScreen";
 import "./CampaignForm.css";
 import "react-bootstrap-typeahead/css/Typeahead.css";

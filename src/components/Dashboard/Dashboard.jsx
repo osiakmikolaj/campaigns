@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import "./Dashboard.css";
 import CampaignCard from "../CampaignCard/CampaignCard";
 import LoadingScreen from "../LoadingScreen/LoadingScreen";
 
@@ -53,26 +52,34 @@ const Dashboard = ({ onNavigateToEdit, onNavigateToCreate }) => {
     }
 
     return (
-        <div className="dashboard-container">
-            <header className="dashboard-header">
-                <h1>Campaigns</h1>
-                <div className="wallet-card">
-                    <span className="wallet-label">Emerald Account Funds</span>
-                    <span className="wallet-balance">{wallet?.balance.toFixed(2)}</span>
+        <div className="container py-4">
+            <header className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                <h1 className="display-5 fw-bold">Campaigns</h1>
+                <div className="card border-0 shadow-sm border-end border-5 border-primary">
+                    <div className="card-body py-2 px-4 d-flex flex-column align-items-end">
+                        <span className="text-muted small text-uppercase fw-bold">Emerald Account Funds</span>
+                        <span className="h3 fw-bold text-primary mb-0">{wallet?.balance.toFixed(2)}</span>
+                    </div>
                 </div>
             </header>
 
-            <div className="action-bar">
-                <button className="btn-primary" onClick={onNavigateToCreate}>
-                    Add Campaign
+            <div className="d-flex justify-content-end mb-4">
+                <button className="btn btn-primary btn-lg" onClick={onNavigateToCreate}>
+                    <i className="bi bi-plus-lg me-2"></i>Add Campaign
                 </button>
             </div>
 
-            <div className="campaign-grid">
+            <div className="row g-4">
                 {campaigns.length === 0 ? (
-                    <p>No campaigns to list</p>
+                    <div className="col-12">
+                        <p>No campaigns to list</p>
+                    </div>
                 ) : (
-                    campaigns.map((campaign) => <CampaignCard key={campaign.id} campaign={campaign} onDelete={handleDelete} onEdit={handleEdit} />)
+                    campaigns.map((campaign) => (
+                        <div key={campaign.id} className="col-12 col-md-6 col-lg-4">
+                            <CampaignCard campaign={campaign} onDelete={handleDelete} onEdit={handleEdit} />
+                        </div>
+                    ))
                 )}
             </div>
         </div>
