@@ -13,6 +13,7 @@ interface Campaign {
     bidAmount: number;
     minAmount: number;
     campaignFund: number;
+    productName?: string;
 }
 
 interface CampaignCardProps {
@@ -39,6 +40,11 @@ const CampaignCard: React.FC<CampaignCardProps> = ({ campaign, onDelete, onEdit 
                             {campaign.town} ({campaign.radius} km)
                         </strong>
                     </li>
+                    {campaign.productName && (
+                        <li className="list-group-item">
+                            Product: <strong>{campaign.productName}</strong>
+                        </li>
+                    )}
                     <li className="list-group-item">
                         Keywords:{" "}
                         <div className="d-flex flex-row flex-wrap gap-1 mt-1">
