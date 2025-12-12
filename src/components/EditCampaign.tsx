@@ -85,7 +85,7 @@ const EditCampaign: React.FC<EditCampaignProps> = () => {
         Promise.all([
             fetch(`${API_URL}/rest/v1/towns?select=*`, { headers: getHeaders() }).then((r) => r.json()),
             fetch(`${API_URL}/rest/v1/products?select=*`, { headers: getHeaders() }).then((r) => r.json()),
-            fetch(`${API_URL}/rest/v1/campaigns?id=eq.${id}&select=*`, { headers: getHeaders() }).then((r) => r.json()),
+            fetch(`${API_URL}/rest/v1/campaigns?id=eq.${campaignId}&select=*`, { headers: getHeaders() }).then((r) => r.json()),
             fetch(`${API_URL}/rest/v1/keywords?select=*`, { headers: getHeaders() }).then((r) => r.json()),
         ])
             .then(([townsData, productsData, campaignDataRes, keywordsData]) => {
