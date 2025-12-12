@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Typeahead } from "react-bootstrap-typeahead";
 import LoadingScreen from "./LoadingScreen";
 
@@ -42,11 +43,7 @@ interface AlertInfo {
     message: string;
 }
 
-interface EditCampaignProps {
-    id: number;
-    onCancel: () => void;
-    onSuccess: () => void;
-}
+interface EditCampaignProps {}
 
 const getHeaders = (): Record<string, string> => ({
     apikey: API_KEY || "",
@@ -55,7 +52,11 @@ const getHeaders = (): Record<string, string> => ({
     Prefer: "return=representation",
 });
 
-const EditCampaign = ({ id, onCancel, onSuccess }: EditCampaignProps) => {
+const EditCampaign: React.FC<EditCampaignProps> = () => {
+    const navigate = useNavigate();
+    const { id } = useParams<{ id: string }>();
+    const campaignId = id ? parseInt(id, 10) : null;
+
     const [formData, setFormData] = useState<CampaignData>({
         name: "",
         keywords: [],
@@ -76,6 +77,11 @@ const EditCampaign = ({ id, onCancel, onSuccess }: EditCampaignProps) => {
     const [originalFund, setOriginalFund] = useState<number>(0);
 
     useEffect(() => {
+        if (!campaignId) {
+            navigate("/");
+            return;
+        }
+
         Promise.all([
             fetch(`${API_URL}/rest/v1/towns?select=*`, { headers: getHeaders() }).then((r) => r.json()),
             fetch(`${API_URL}/rest/v1/products?select=*`, { headers: getHeaders() }).then((r) => r.json()),
@@ -88,6 +94,10 @@ const EditCampaign = ({ id, onCancel, onSuccess }: EditCampaignProps) => {
                 setAvailableKeywords(keywordsData);
 
                 const campaignData = campaignDataRes[0];
+                if (!campaignData) {
+                    navigate("/");
+                    return;
+                }
                 setFormData({
                     ...campaignData,
                     keywords: campaignData.keywords || [],
@@ -99,7 +109,7 @@ const EditCampaign = ({ id, onCancel, onSuccess }: EditCampaignProps) => {
                 console.error("Failed to fetch data", e);
                 setLoading(false);
             });
-    }, [id]);
+    }, [campaignId, navigate]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -109,6 +119,8 @@ const EditCampaign = ({ id, onCancel, onSuccess }: EditCampaignProps) => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setAlertInfo(null);
+
+        if (!campaignId) return;
 
         if (formData.keywords.length === 0) {
             setAlertInfo({ type: "danger", message: "Keywords are mandatory! Please select at least one." });
@@ -154,26 +166,34 @@ const EditCampaign = ({ id, onCancel, onSuccess }: EditCampaignProps) => {
                 keywords: formData.keywords,
             };
 
-            await fetch(`${API_URL}/rest/v1/campaigns?id=eq.${id}`, {
+            await fetch(`${API_URL}/rest/v1/campaigns?id=eq.${campaignId}`, {
                 method: "PATCH",
                 headers: getHeaders(),
                 body: JSON.stringify(updatedCampaign),
             });
             setAlertInfo({ type: "success", message: "The changes are saved!" });
-            setTimeout(() => onSuccess(), 2000);
+            setTimeout(() => navigate("/"), 2000);
         } catch (e) {
             console.error("Edit error.", e);
             setAlertInfo({ type: "danger", message: "An error occurred." });
         }
     };
 
+    const handleCancel = (): void => {
+        navigate("/");
+    };
+
     if (loading) {
         return <LoadingScreen />;
     }
 
+    if (!campaignId) {
+        return null;
+    }
+
     return (
         <div className="container">
-            <h3 className="mt-3">Edit Campaign (ID: {id})</h3>
+            <h3 className="mt-3">Edit Campaign (ID: {campaignId})</h3>
             {alertInfo && (
                 <div className={`alert alert-${alertInfo.type} alert-dismissible fade show`} role="alert">
                     {alertInfo.message}
@@ -300,7 +320,7 @@ const EditCampaign = ({ id, onCancel, onSuccess }: EditCampaignProps) => {
                 </div>
 
                 <div className="d-grid gap-2 d-md-flex justify-content-md-start mb-3">
-                    <button type="button" onClick={onCancel} className="btn btn-secondary">
+                    <button type="button" onClick={handleCancel} className="btn btn-secondary">
                         Cancel
                     </button>
                     <button type="submit" className="btn btn-primary">

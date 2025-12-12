@@ -1,4 +1,5 @@
 import { useEffect, useState, ChangeEvent, FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import { Typeahead } from "react-bootstrap-typeahead";
 import LoadingScreen from "./LoadingScreen";
 
@@ -30,10 +31,7 @@ interface AlertInfo {
     message: string;
 }
 
-interface CreateCampaignProps {
-    onCancel: () => void;
-    onSuccess: () => void;
-}
+interface CreateCampaignProps {}
 
 interface FormData {
     name: string;
@@ -54,7 +52,9 @@ const getHeaders = (): Record<string, string> => ({
     Prefer: "return=representation",
 });
 
-const CreateCampaign: React.FC<CreateCampaignProps> = ({ onCancel, onSuccess }) => {
+const CreateCampaign: React.FC<CreateCampaignProps> = () => {
+    const navigate = useNavigate();
+
     const [formData, setFormData] = useState<FormData>({
         name: "",
         keywords: [],
@@ -170,11 +170,15 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onCancel, onSuccess }) 
             });
 
             setAlertInfo({ type: "success", message: "Campaign is created!" });
-            setTimeout(() => onSuccess(), 2000);
+            setTimeout(() => navigate("/"), 2000);
         } catch (e) {
             console.log(e);
             setAlertInfo({ type: "danger", message: "An error occurred while communicating with the database." });
         }
+    };
+
+    const handleCancel = (): void => {
+        navigate("/");
     };
 
     if (loading) {
@@ -279,7 +283,7 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onCancel, onSuccess }) 
                 </div>
 
                 <div className="d-grid gap-2 d-md-flex justify-content-md-start mb-3">
-                    <button type="button" onClick={onCancel} className="btn btn-secondary">
+                    <button type="button" onClick={handleCancel} className="btn btn-secondary">
                         Cancel
                     </button>
                     <button type="submit" className="btn btn-primary">

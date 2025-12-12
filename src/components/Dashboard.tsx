@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import CampaignCard from "./CampaignCard";
 import LoadingScreen from "./LoadingScreen";
 
@@ -27,10 +28,7 @@ interface AlertInfo {
     message: string;
 }
 
-interface DashboardProps {
-    onNavigateToEdit: (id: number) => void;
-    onNavigateToCreate: () => void;
-}
+interface DashboardProps {}
 
 const getHeaders = (): Record<string, string> => ({
     apikey: API_KEY || "",
@@ -39,7 +37,9 @@ const getHeaders = (): Record<string, string> => ({
     Prefer: "return=representation",
 });
 
-const Dashboard: React.FC<DashboardProps> = ({ onNavigateToEdit, onNavigateToCreate }) => {
+const Dashboard: React.FC<DashboardProps> = () => {
+    const navigate = useNavigate();
+
     const [campaigns, setCampaigns] = useState<Campaign[]>([]);
     const [wallet, setWallet] = useState<Wallet | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
@@ -103,7 +103,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigateToEdit, onNavigateToCre
     };
 
     const handleEdit = (id: number): void => {
-        onNavigateToEdit(id);
+        navigate(`/edit/${id}`);
+    };
+
+    const handleNavigateToCreate = (): void => {
+        navigate("/create");
     };
 
     if (loading) {
@@ -154,7 +158,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigateToEdit, onNavigateToCre
             </header>
 
             <div className="d-flex flex-row justify-content-end mb-4">
-                <button className="btn btn-primary btn-md" onClick={onNavigateToCreate}>
+                <button className="btn btn-primary btn-md" onClick={handleNavigateToCreate}>
                     Add Campaign
                 </button>
             </div>
