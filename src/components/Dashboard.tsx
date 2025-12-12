@@ -168,7 +168,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
                 <div className="card border-1 shadow-sm ms-auto">
                     <div className="card-body py-2 px-3 d-flex flex-column align-items-end">
                         <span className="text-muted small text-uppercase fw-bold">Emerald Account Funds</span>
-                        <span className="h4 fw-bold text-primary mb-0">{wallet?.balance?.toFixed(2) || "0.00"}</span>
+                        <span className="h4 fw-bold text-primary mb-0">$ {wallet?.balance?.toFixed(2) || "0.00"}</span>
                     </div>
                 </div>
             </header>
