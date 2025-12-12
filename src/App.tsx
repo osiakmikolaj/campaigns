@@ -6,10 +6,10 @@ import EditCampaign from "./components/EditCampaign";
 import CreateCampaign from "./components/CreateCampaign";
 
 function App() {
-    const [view, setView] = useState("dashboard");
-    const [editingId, setEditingId] = useState(null);
+    const [view, setView] = useState<"dashboard" | "create" | "edit">("dashboard");
+    const [editingId, setEditingId] = useState<number | null>(null);
 
-    const handleStartEdit = (id) => {
+    const handleStartEdit = (id: number) => {
         setEditingId(id);
         setView("edit");
     };

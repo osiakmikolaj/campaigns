@@ -1,19 +1,61 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, ChangeEvent, FormEvent } from "react";
 import { Typeahead } from "react-bootstrap-typeahead";
 import LoadingScreen from "./LoadingScreen";
 
 const API_URL = process.env.REACT_APP_SUPABASE_URL;
 const API_KEY = process.env.REACT_APP_SUPABASE_KEY;
 
-const getHeaders = () => ({
-    apikey: API_KEY,
-    Authorization: `Bearer ${API_KEY}`,
+interface Town {
+    id: number;
+    name: string;
+}
+
+interface Product {
+    id: number;
+    name: string;
+}
+
+interface Keyword {
+    id: number;
+    name: string;
+}
+
+interface Wallet {
+    id: number;
+    balance: number;
+}
+
+interface AlertInfo {
+    type: "success" | "danger";
+    message: string;
+}
+
+interface CreateCampaignProps {
+    onCancel: () => void;
+    onSuccess: () => void;
+}
+
+interface FormData {
+    name: string;
+    keywords: Keyword[];
+    bidAmount: number | string;
+    minAmount: number | string;
+    campaignFund: number | string;
+    status: "on" | "off";
+    town: string;
+    radius: number | string;
+    productId: string;
+}
+
+const getHeaders = (): Record<string, string> => ({
+    apikey: API_KEY || "",
+    Authorization: `Bearer ${API_KEY || ""}`,
     "Content-Type": "application/json",
     Prefer: "return=representation",
 });
 
-const CreateCampaign = ({ onCancel, onSuccess }) => {
-    const [formData, setFormData] = useState({
+const CreateCampaign: React.FC<CreateCampaignProps> = ({ onCancel, onSuccess }) => {
+    const [formData, setFormData] = useState<FormData>({
         name: "",
         keywords: [],
         bidAmount: 0,
@@ -25,24 +67,24 @@ const CreateCampaign = ({ onCancel, onSuccess }) => {
         productId: "",
     });
 
-    const [towns, setTowns] = useState([]);
-    const [products, setProducts] = useState([]);
-    const [availableKeywords, setaAvailableKeywords] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [alertInfo, setAlertInfo] = useState(null);
+    const [towns, setTowns] = useState<Town[]>([]);
+    const [products, setProducts] = useState<Product[]>([]);
+    const [availableKeywords, setaAvailableKeywords] = useState<Keyword[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [alertInfo, setAlertInfo] = useState<AlertInfo | null>(null);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchData = async (): Promise<void> => {
             try {
-                const [townsRes, productsRes, keywordsRes] = await Promise.all([
+                const [townsRes, productsRes, keywordsRes]: [Response, Response, Response] = await Promise.all([
                     fetch(`${API_URL}/rest/v1/towns?select=*`, { headers: getHeaders() }),
                     fetch(`${API_URL}/rest/v1/products?select=*`, { headers: getHeaders() }),
                     fetch(`${API_URL}/rest/v1/keywords?select=*`, { headers: getHeaders() }),
                 ]);
 
-                const townsData = await townsRes.json();
-                const productsData = await productsRes.json();
-                const keywordsData = await keywordsRes.json();
+                const townsData: Town[] = await townsRes.json();
+                const productsData: Product[] = await productsRes.json();
+                const keywordsData: Keyword[] = await keywordsRes.json();
 
                 setTowns(townsData);
                 setProducts(productsData);
@@ -57,12 +99,12 @@ const CreateCampaign = ({ onCancel, onSuccess }) => {
         fetchData();
     }, []);
 
-    const handleChange = (e) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
         setAlertInfo(null);
 
@@ -71,9 +113,9 @@ const CreateCampaign = ({ onCancel, onSuccess }) => {
             return;
         }
 
-        const cost = parseFloat(formData.campaignFund);
-        const bid = parseFloat(formData.bidAmount);
-        const min = parseFloat(formData.minAmount);
+        const cost = parseFloat(formData.campaignFund.toString());
+        const bid = parseFloat(formData.bidAmount.toString());
+        const min = parseFloat(formData.minAmount.toString());
 
         if (min > bid) {
             setAlertInfo({ type: "danger", message: "Min Amount cannot be greater than Bid Amount!" });
@@ -89,7 +131,7 @@ const CreateCampaign = ({ onCancel, onSuccess }) => {
             const walletRes = await fetch(`${API_URL}/rest/v1/wallet?select=*`, {
                 headers: getHeaders(),
             });
-            const walletData = await walletRes.json();
+            const walletData: Wallet[] = await walletRes.json();
 
             if (!walletData || walletData.length === 0) {
                 throw new Error("Wallet not found");
@@ -112,12 +154,12 @@ const CreateCampaign = ({ onCancel, onSuccess }) => {
                 id: Date.now().toString(),
                 name: formData.name,
                 keywords: formData.keywords,
-                bidAmount: parseFloat(formData.bidAmount),
-                minAmount: parseFloat(formData.minAmount),
-                campaignFund: parseFloat(formData.campaignFund),
+                bidAmount: parseFloat(formData.bidAmount.toString()),
+                minAmount: parseFloat(formData.minAmount.toString()),
+                campaignFund: parseFloat(formData.campaignFund.toString()),
                 status: formData.status,
                 town: formData.town,
-                radius: parseInt(formData.radius),
+                radius: parseInt(formData.radius.toString()),
                 productId: String(formData.productId),
             };
 
@@ -180,8 +222,8 @@ const CreateCampaign = ({ onCancel, onSuccess }) => {
                         labelKey="name"
                         options={availableKeywords}
                         placeholder="Select required keywords..."
-                        onChange={(selected) => {
-                            setFormData({ ...formData, keywords: selected });
+                        onChange={(selected: unknown[]) => {
+                            setFormData({ ...formData, keywords: selected as Keyword[] });
                         }}
                     />
                 </div>

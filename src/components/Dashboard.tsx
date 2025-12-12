@@ -5,23 +5,50 @@ import LoadingScreen from "./LoadingScreen";
 const API_URL = process.env.REACT_APP_SUPABASE_URL;
 const API_KEY = process.env.REACT_APP_SUPABASE_KEY;
 
-const getHeaders = () => ({
-    apikey: API_KEY,
-    Authorization: `Bearer ${API_KEY}`,
+interface Campaign {
+    id: number;
+    name: string;
+    status: "on" | "off";
+    town: string;
+    radius: number;
+    keywords: { id: number; name: string }[];
+    bidAmount: number;
+    minAmount: number;
+    campaignFund: number;
+}
+
+interface Wallet {
+    id: number;
+    balance: number;
+}
+
+interface AlertInfo {
+    type: "success" | "danger";
+    message: string;
+}
+
+interface DashboardProps {
+    onNavigateToEdit: (id: number) => void;
+    onNavigateToCreate: () => void;
+}
+
+const getHeaders = (): Record<string, string> => ({
+    apikey: API_KEY || "",
+    Authorization: `Bearer ${API_KEY || ""}`,
     "Content-Type": "application/json",
     Prefer: "return=representation",
 });
 
-const Dashboard = ({ onNavigateToEdit, onNavigateToCreate }) => {
-    const [campaigns, setCampaigns] = useState([]);
-    const [wallet, setWallet] = useState(null);
-    const [loading, setLoading] = useState(true);
+const Dashboard: React.FC<DashboardProps> = ({ onNavigateToEdit, onNavigateToCreate }) => {
+    const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+    const [wallet, setWallet] = useState<Wallet | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
 
-    const [deleteId, setDeleteId] = useState(null);
-    const [alertInfo, setAlertInfo] = useState(null);
+    const [deleteId, setDeleteId] = useState<number | null>(null);
+    const [alertInfo, setAlertInfo] = useState<AlertInfo | null>(null);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchData = async (): Promise<void> => {
             try {
                 const [campaignsRes, walletRes] = await Promise.all([
                     fetch(`${API_URL}/rest/v1/campaigns?select=*`, { headers: getHeaders() }),
@@ -32,11 +59,11 @@ const Dashboard = ({ onNavigateToEdit, onNavigateToCreate }) => {
                     throw new Error("Error! Fetching the data from API");
                 }
 
-                const campaignsData = await campaignsRes.json();
-                const walletData = await walletRes.json();
+                const campaignsData: Campaign[] = await campaignsRes.json();
+                const walletData: Wallet[] = await walletRes.json();
 
                 setCampaigns(campaignsData);
-                setWallet(walletData.length > 0 ? walletData[0] : { balance: 0 });
+                setWallet(walletData.length > 0 ? walletData[0] : { id: 0, balance: 0 });
             } catch (e) {
                 console.error("Error!", e);
                 setAlertInfo({ type: "danger", message: "Failed to load data from server." });
@@ -47,11 +74,11 @@ const Dashboard = ({ onNavigateToEdit, onNavigateToCreate }) => {
         fetchData();
     }, []);
 
-    const handleDeleteClick = (id) => {
+    const handleDeleteClick = (id: number): void => {
         setDeleteId(id);
     };
 
-    const confirmDelete = async () => {
+    const confirmDelete = async (): Promise<void> => {
         if (!deleteId) return;
         try {
             const response = await fetch(`${API_URL}/rest/v1/campaigns?id=eq.${deleteId}`, {
@@ -75,7 +102,7 @@ const Dashboard = ({ onNavigateToEdit, onNavigateToCreate }) => {
         }
     };
 
-    const handleEdit = (id) => {
+    const handleEdit = (id: number): void => {
         onNavigateToEdit(id);
     };
 
@@ -93,7 +120,7 @@ const Dashboard = ({ onNavigateToEdit, onNavigateToCreate }) => {
             )}
 
             {deleteId && (
-                <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+                <div className="modal d-block" tabIndex={-1} style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">

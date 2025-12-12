@@ -1,4 +1,27 @@
-const CampaignCard = ({ campaign, onDelete, onEdit }) => {
+interface Keyword {
+    id: number;
+    name: string;
+}
+
+interface Campaign {
+    id: number;
+    name: string;
+    status: "on" | "off";
+    town: string;
+    radius: number;
+    keywords: Keyword[];
+    bidAmount: number;
+    minAmount: number;
+    campaignFund: number;
+}
+
+interface CampaignCardProps {
+    campaign: Campaign;
+    onDelete: (id: number) => void;
+    onEdit: (id: number) => void;
+}
+
+const CampaignCard: React.FC<CampaignCardProps> = ({ campaign, onDelete, onEdit }) => {
     return (
         <div className="card border-0 h-100 shadow">
             <div className="card-body d-flex flex-column">
@@ -9,30 +32,30 @@ const CampaignCard = ({ campaign, onDelete, onEdit }) => {
                     </span>
                 </div>
 
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
+                <ul className="list-group list-group-flush">
+                    <li className="list-group-item">
                         City:{" "}
                         <strong>
                             {campaign.town} ({campaign.radius} km)
                         </strong>
                     </li>
-                    <li class="list-group-item">
+                    <li className="list-group-item">
                         Keywords:{" "}
                         <div className="d-flex flex-row flex-wrap gap-1 mt-1">
                             {campaign.keywords.map((k, index) => (
                                 <span key={k.id || index} className="badge rounded-pill text-bg-secondary">
-                                    {k.name || k}
+                                    {k.name}
                                 </span>
                             ))}
                         </div>
                     </li>
-                    <li class="list-group-item">
+                    <li className="list-group-item">
                         Bid amount: <strong>{campaign.bidAmount}</strong>
                     </li>
-                    <li class="list-group-item">
+                    <li className="list-group-item">
                         Minimum bid amount: <strong>{campaign.minAmount}</strong>
                     </li>
-                    <li class="list-group-item">
+                    <li className="list-group-item">
                         Funds: <strong>{campaign.campaignFund}</strong>
                     </li>
                     <li className="list-group-item"></li>

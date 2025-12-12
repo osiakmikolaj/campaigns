@@ -5,15 +5,58 @@ import LoadingScreen from "./LoadingScreen";
 const API_URL = process.env.REACT_APP_SUPABASE_URL;
 const API_KEY = process.env.REACT_APP_SUPABASE_KEY;
 
-const getHeaders = () => ({
-    apikey: API_KEY,
-    Authorization: `Bearer ${API_KEY}`,
+interface Keyword {
+    id: number;
+    name: string;
+}
+
+interface Town {
+    id: number;
+    name: string;
+}
+
+interface Product {
+    id: number;
+    name: string;
+}
+
+interface CampaignData {
+    name: string;
+    keywords: Keyword[];
+    bidAmount: number;
+    minAmount: number;
+    campaignFund: number;
+    status: "on" | "off";
+    town: string;
+    radius: number;
+    productId: string;
+}
+
+interface Wallet {
+    id: number;
+    balance: number;
+}
+
+interface AlertInfo {
+    type: "success" | "danger";
+    message: string;
+}
+
+interface EditCampaignProps {
+    id: number;
+    onCancel: () => void;
+    onSuccess: () => void;
+}
+
+const getHeaders = (): Record<string, string> => ({
+    apikey: API_KEY || "",
+    Authorization: `Bearer ${API_KEY || ""}`,
     "Content-Type": "application/json",
     Prefer: "return=representation",
 });
 
-const EditCampaign = ({ id, onCancel, onSuccess }) => {
-    const [formData, setFormData] = useState({
+const EditCampaign = ({ id, onCancel, onSuccess }: EditCampaignProps) => {
+    const [formData, setFormData] = useState<CampaignData>({
         name: "",
         keywords: [],
         bidAmount: 0,
@@ -25,12 +68,12 @@ const EditCampaign = ({ id, onCancel, onSuccess }) => {
         productId: "",
     });
 
-    const [towns, setTowns] = useState([]);
-    const [products, setProducts] = useState([]);
-    const [availableKeywords, setAvailableKeywords] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [alertInfo, setAlertInfo] = useState(null);
-    const [originalFund, setOriginalFund] = useState(0);
+    const [towns, setTowns] = useState<Town[]>([]);
+    const [products, setProducts] = useState<Product[]>([]);
+    const [availableKeywords, setAvailableKeywords] = useState<Keyword[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [alertInfo, setAlertInfo] = useState<AlertInfo | null>(null);
+    const [originalFund, setOriginalFund] = useState<number>(0);
 
     useEffect(() => {
         Promise.all([
@@ -58,12 +101,12 @@ const EditCampaign = ({ id, onCancel, onSuccess }) => {
             });
     }, [id]);
 
-    const handleChange = (e) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setAlertInfo(null);
 
@@ -72,8 +115,8 @@ const EditCampaign = ({ id, onCancel, onSuccess }) => {
             return;
         }
 
-        const bid = parseFloat(formData.bidAmount);
-        const min = parseFloat(formData.minAmount);
+        const bid = parseFloat(String(formData.bidAmount));
+        const min = parseFloat(String(formData.minAmount));
 
         if (min > bid) {
             setAlertInfo({ type: "danger", message: "Min Amount cannot be greater than Bid Amount!" });
@@ -81,12 +124,12 @@ const EditCampaign = ({ id, onCancel, onSuccess }) => {
         }
 
         try {
-            const newFund = parseFloat(formData.campaignFund);
+            const newFund = parseFloat(String(formData.campaignFund));
             const diff = newFund - originalFund;
 
             if (diff !== 0) {
                 const walletRes = await fetch(`${API_URL}/rest/v1/wallet?select=*`, { headers: getHeaders() });
-                const walletData = await walletRes.json();
+                const walletData: Wallet[] = await walletRes.json();
                 const wallet = walletData[0];
 
                 if (diff > 0 && wallet.balance < diff) {
@@ -103,10 +146,10 @@ const EditCampaign = ({ id, onCancel, onSuccess }) => {
 
             const updatedCampaign = {
                 ...formData,
-                bidAmount: parseFloat(formData.bidAmount),
-                minAmount: parseFloat(formData.minAmount),
+                bidAmount: parseFloat(String(formData.bidAmount)),
+                minAmount: parseFloat(String(formData.minAmount)),
                 campaignFund: newFund,
-                radius: parseInt(formData.radius),
+                radius: parseInt(String(formData.radius)),
                 productId: String(formData.productId),
                 keywords: formData.keywords,
             };
@@ -157,7 +200,7 @@ const EditCampaign = ({ id, onCancel, onSuccess }) => {
                         selected={formData.keywords}
                         placeholder="Select keywords..."
                         onChange={(selected) => {
-                            setFormData({ ...formData, keywords: selected });
+                            setFormData({ ...formData, keywords: selected as Keyword[] });
                         }}
                     />
                 </div>
