@@ -16,6 +16,13 @@ interface Campaign {
     bidAmount: number;
     minAmount: number;
     campaignFund: number;
+    productId: string;
+    productName?: string;
+}
+
+interface Product {
+    id: number;
+    name: string;
 }
 
 interface Wallet {
@@ -50,19 +57,28 @@ const Dashboard: React.FC<DashboardProps> = () => {
     useEffect(() => {
         const fetchData = async (): Promise<void> => {
             try {
-                const [campaignsRes, walletRes] = await Promise.all([
+                const [campaignsRes, productsRes, walletRes] = await Promise.all([
                     fetch(`${API_URL}/rest/v1/campaigns?select=*`, { headers: getHeaders() }),
+                    fetch(`${API_URL}/rest/v1/products?select=*`, { headers: getHeaders() }),
                     fetch(`${API_URL}/rest/v1/wallet?select=*`, { headers: getHeaders() }),
                 ]);
 
-                if (!campaignsRes.ok || !walletRes.ok) {
-                    throw new Error("Error! Fetching the data from API");
+                if (!campaignsRes.ok || !productsRes.ok || !walletRes.ok) {
+                    throw new Error("Error while fetching the data from API");
                 }
 
                 const campaignsData: Campaign[] = await campaignsRes.json();
+                const productsData: Product[] = await productsRes.json();
                 const walletData: Wallet[] = await walletRes.json();
 
-                setCampaigns(campaignsData);
+                const productsMap = new Map(productsData.map((p) => [p.id.toString(), p.name]));
+
+                const mappedCampaigns = campaignsData.map((campaign) => ({
+                    ...campaign,
+                    productName: productsMap.get(campaign.productId) || undefined,
+                }));
+
+                setCampaigns(mappedCampaigns);
                 setWallet(walletData.length > 0 ? walletData[0] : { id: 0, balance: 0 });
             } catch (e) {
                 console.error("Error!", e);
